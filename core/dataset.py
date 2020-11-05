@@ -277,8 +277,10 @@ class Dataset(object):
             image, bboxes = self.random_translate(
                 np.copy(image), np.copy(bboxes)
             )
-
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        else:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
         image, bboxes = utils.image_preprocess(
             np.copy(image),
             [self.train_input_size, self.train_input_size],
@@ -363,7 +365,8 @@ class Dataset(object):
                 xind, yind = np.floor(
                     bbox_xywh_scaled[best_detect, 0:2]
                 ).astype(np.int32)
-
+                
+                print(label[best_detect].shape)
                 label[best_detect][yind, xind, best_anchor, :] = 0
                 label[best_detect][yind, xind, best_anchor, 0:4] = bbox_xywh
                 label[best_detect][yind, xind, best_anchor, 4:5] = 1.0
